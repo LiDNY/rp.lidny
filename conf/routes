@@ -92,12 +92,6 @@ GET     /about                                          controllers.AboutControl
 GET     /privacy                                        controllers.AboutController.privacy(request: Request)
 GET     /status                                         controllers.AboutController.status(request: Request)
 
-GET     /calendar                                       controllers.CalendarController.view(request: Request)
-GET     /calendar/order                                 controllers.CalendarController.order(request: Request)
-POST    /calendar/order                                 controllers.CalendarController.orderPost(request: Request)
-GET     /calendar/orders                                controllers.CalendarController.list(request: Request)
-POST    /calendar/orders                                controllers.CalendarController.listPost(request: Request)
-
 GET     /photos/original/:id.jpg                        controllers.FilesController.original(request: Request, id: Integer)
 GET     /pictures/original/:id.jpg                      controllers.FilesController.original(request: Request, id: Integer)
 GET     /photos/small/:id.jpg                           controllers.FilesController.small(request: Request, id: Integer)
