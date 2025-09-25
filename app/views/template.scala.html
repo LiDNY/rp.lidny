@@ -26,7 +26,7 @@
 <div id='main'>
     <nav class='navbar navbar-expand-md navbar-dark'>
         <div class='logo'>
-            <a href='/'>@if(lang=="en"){<span style="color: #a0a0a0; font-size: 30px;">rail.pictures</span>}else{<span style="color: #a0a0a0; font-size: 30px;">bahnbilder</span><span style="color: #707070; font-size: 22px;">.ch</span>}</a>
+            <a href='/'>@if(lang=="en"){<span style="color: #a0a0a0; font-size: 30px;">rp.lidny.org</span>}else{<span style="color: #a0a0a0; font-size: 30px;">rp.lidny.org</span>}</a>
         </div>
         <button class='navbar-toggler' type='button' data-toggle='collapse' data-target='#navbarContent' aria-controls='navbarContent' aria-expanded='false' aria-label='Navigation'>
             <span class='navbar-toggler-icon'></span>
@@ -39,7 +39,6 @@
                 <li class='nav-item'><a @if(menu=="browse"){class='active'} href='@routes.BrowseController.browse(1, null, null, null)'>@i18n.Txt.get(lang, "browse")</a></li>
                 <li class='nav-item'><a @if(menu=="search"){class='active'} href='@routes.SearchController.search()'>@i18n.Txt.get(lang, "search")</a></li>
                 <li class='nav-item'><a @if(menu=="map"){class='active'} href='@routes.MapController.view()'>@i18n.Txt.get(lang, "map")</a></li>
-                <li class='nav-item'><a @if(menu=="calendar"){class='active'} href='@routes.CalendarController.view()'>@i18n.Txt.get(lang, "calendar")</a></li>
                 <li class='nav-item'><a @if(menu=="webcamzhb"){class='active'} href='/webcamzhb'>@i18n.Txt.get(lang, "webcamZHB")</a></li>
                 <li class='nav-item'><a @if(menu=="about"){class='active'} href='/about'>@i18n.Txt.get(lang, "about")</a></li>
             </ul>
@@ -59,7 +58,7 @@
     </div>
 </div>
 <footer>
-    <span id='footer-text'><a href='https://www.facebook.com/www.bahnbilder.ch' target='_blank'>@i18n.Txt.get(lang, "followUsOnFacebook")</a> &middot; <a href='@routes.AboutController.privacy()'>@i18n.Txt.get(lang, "privacyPolicy")</a> &middot; @if(lang!="en"){<a href='@routes.HomeController.lang("en", request.uri())'>English</a>}@if(lang!="de"){<a href='@routes.HomeController.lang("de", request.uri())'>Deutsch</a>}</span>
+    <span id='footer-text'><a href='@routes.AboutController.privacy()'>@i18n.Txt.get(lang, "privacyPolicy")</a> &middot; @if(lang!="en"){<a href='@routes.HomeController.lang("en", request.uri())'>English</a>}@if(lang!="de"){<a href='@routes.HomeController.lang("de", request.uri())'>Deutsch</a>}</span>
 </footer>
 </body>
 </html>
