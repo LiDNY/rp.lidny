@@ -15,8 +15,5 @@ Todo:
 - Fix bugs (there is a lot, cause we cant code for shit)
 - More customization
 - User registration
-- Get bertha to marry me again
-- ???
-- Profit
 
 *RP stands for Rail Pictures, not Roleplay :P
