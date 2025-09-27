@@ -135,7 +135,14 @@
                     <h2>@i18n.Txt.get(lang, "map")</h2>
                     <hr>
                     <div id='map-content'>
-                        <iframe src='https://www.google.com/maps/embed/v1/place?key=AIzaSyCSTI76nMO56dK7L252bAD24E6rQROFRms&amp;q=@photo.getLat(),@photo.getLng()'></iframe>
+                        <script>
+                            window.map_location = [ @photo.getLat(), @photo.getLng() ]
+                        </script>
+                        <link rel="stylesheet" href='@routes.Assets.versioned("open-layers/ol.css")'>
+                        <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/map-custom-overlays.css")'>
+                        <script src='@routes.Assets.versioned("open-layers/ol.js")'></script>
+                        <script src='@routes.Assets.versioned("javascripts/photo-map.js")'></script>
+                        <div id="map" style="position: absolute; width: 100%; height: 100%; left: 0px; right: 0px;"></div>
                     </div>
                 </div>
             </div>

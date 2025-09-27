@@ -35,7 +35,6 @@ public class MapController extends Controller {
         }
         injector.injectMembers(search);
 
-
         return ok(views.html.map.view.render(request, search, Config.Option.GOOGLE_MAPS_JS_KEY.get(), user, lang));
     }
 

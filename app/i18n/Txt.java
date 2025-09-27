@@ -310,8 +310,8 @@ public class Txt {
         en.put("manage", "Manage");
         de.put("manage", "Verwaltung");
 
-        en.put("map", "Photo Map");
-        de.put("map", "Fotokarte");
+        en.put("map", "Railway Map");
+        de.put("map", "Eisenbahnkarte");
 
         en.put("modifySearch", "Modify Search");
         de.put("modifySearch", "Suche ändern");

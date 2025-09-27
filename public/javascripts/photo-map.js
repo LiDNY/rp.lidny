@@ -1,11 +1,35 @@
-var infowindow;
-var map;
-var markers = [];
-var markerCount = 0;
-var closeTimeout;
+window.addEventListener("DOMContentLoaded", () => {
+    const lonlat = window.map_location || [ 0, 0 ];
 
-$(document).ready(function() {
-    class LayerToggle extends ol.control.Control {
+    class OpenOnControl extends ol.control.Control {
+        constructor(opt_options) {
+            const options = opt_options || {};
+            const element = document.createElement('div');
+            element.className = 'ol-unselectable ol-control ol-urls';
+
+            const coords = options.coords || [ 0, 0 ]
+            const zoom = options.zoom || 18
+
+            function url(link, name) {
+                const url = document.createElement('a');
+                url.href = link;
+                url.innerText = name;
+                url.target = "window"
+
+                element.appendChild(url);
+            }
+
+            url('https://www.google.com/maps/@' + coords[1].toString() + ',' + coords[0].toString() + ',' + zoom.toString() + 'z', 'View on Google Maps')
+            url('https://www.openstreetmap.org/#map=' + zoom.toString() + '/' + coords[1].toString() + '/' + coords[0].toString(), 'View on OpenStreetMap')
+
+            super({
+                element: element,
+                target: options.target,
+            });
+        }
+    }
+
+    class LayerToogle extends ol.control.Control {
         constructor(opt_options) {
             const options = opt_options || {};
             const element = document.createElement('div');
@@ -39,18 +63,6 @@ $(document).ready(function() {
         }
     }
 
-    var zoom = parseInt(window.localStorage.getItem('map-zoom'));
-    if (isNaN(zoom)) {
-        zoom = 3;
-    }
-
-    var lat = parseFloat(window.localStorage.getItem('map-lat'));
-    var lng = parseFloat(window.localStorage.getItem('map-lng'));
-    if (isNaN(lat) || isNaN(lng)) {
-        lat = 47;
-        lng = 8;
-    }
-
     const openRailwayMapLayer = new ol.layer.Tile({
         title: 'OpenRailwayMap',
         visible: true,
@@ -70,7 +82,11 @@ $(document).ready(function() {
         controls: [
             new ol.control.Zoom(),
             new ol.control.Attribution(),
-            new ol.control.FullScreen()
+            new ol.control.FullScreen(),
+            new OpenOnControl({
+                coords: lonlat,
+                zoom: 18
+            })
         ],
         target: 'map',
         layers: [
@@ -82,18 +98,41 @@ $(document).ready(function() {
         ],
         view: new ol.View({
             center: [0, 0],
-            zoom: zoom,
+            zoom: 2,
         }),
     });
 
-    window.map.addControl(new LayerToggle({
+    window.map.addControl(new LayerToogle({
         name: "railway",
         layer: openRailwayMapLayer,
         enabled: true
     }))
 
-    const coords = ol.proj.fromLonLat([lng, lat]);
+    const coords = ol.proj.fromLonLat(lonlat);
+    const marker = new ol.Feature({
+        geometry: new ol.geom.Point(coords)
+    });
+
+    const markerStyle = new ol.style.Style({
+        image: new ol.style.Icon({
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            src: '/marker.png',
+            scale: 0.25
+        })
+    });
+
+    const vectorLayer = new ol.layer.Vector({
+        source: new ol.source.Vector({
+            features: [marker]
+        })
+    });
+
+    marker.setStyle(markerStyle);
+    vectorLayer.setZIndex( 1001 );
 
     window.map.getView().setCenter(coords);
-    window.map.getView().setZoom(zoom);
+    window.map.getView().setZoom(18);
+    window.map.addLayer(vectorLayer);
 });

@@ -1,0 +1,55 @@
+.ol-urls {
+    opacity: 0.8;
+    background: #ffffffdc;
+    border: solid #0000004b 1px;
+    padding: 4px 8px;
+    width: fit-content;
+    position: absolute;
+    top: calc(100% - 0.5em);
+    left: 0.5em;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    transform: translate(0, -100%);
+}
+
+.ol-urls:hover {
+    opacity: 1;
+}
+
+.ol-urls a {
+    font-size: small;
+    color: #2c2c2c;
+    text-decoration: none;
+}
+
+.ol-urls a:hover {
+    color: #4e4e4e;
+    text-decoration: underline;
+}
+
+.ol-toggle {
+    opacity: 0.8;
+    background: #ffffffdc;
+    border: solid #0000004b 1px;
+    padding: 4px 8px;
+    width: fit-content;
+    position: absolute;
+    top: 0.5em;
+    left: 2.5em;
+}
+
+.ol-toggle:hover {
+    opacity: 1;
+}
+
+.ol-toggle a {
+    font-size: small;
+    color: #2c2c2c;
+    text-decoration: none;
+}
+
+.ol-toggle a:hover {
+    color: #4e4e4e;
+    text-decoration: underline;
+}
