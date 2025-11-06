@@ -101,7 +101,7 @@ public class Config {
         if ("en".equals(lang)) {
             host = Config.Option.HOST_EN.get();
         }
-        return host == null ? ("localhost:" + (tlsEnabled() ? tlsPort : plainPort)) : host;
+        return host == null ? ("rp.lidny.org") : host; // i have no idea how to fix this so i just changed it to the domain, when selfhosting change this please 
     }
 
     public static String getSelfUrl(String lang) {
