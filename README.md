@@ -1,4 +1,4 @@
-# Hey, this is LiDNY RP 
+# Hey, this is LiDNY Rail Pictures
 
 Join our [discord](https://ldn.to/discord)
 
@@ -16,4 +16,4 @@ This is a fork of [bahnbilder.ch](https://github.com/davidgubler/bahnbilder.ch).
 - More customization
 - User registration
 
-*RP stands for Rail Pictures, not Roleplay :P
+[How to setup](https://github.com/LiDNY/rp.lidny/wiki/Running)
