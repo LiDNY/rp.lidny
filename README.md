@@ -7,7 +7,7 @@ This is a fork of [bahnbilder.ch](https://github.com/davidgubler/bahnbilder.ch).
 ## Current changes from bahnbilder.ch
 
 - Removed Calendar
-- Replaced Google Maps with OpenRailwayMap (Broken except the [Railway map](https://rp.lidny.org/map) for now.)
+- Replaced Google Maps with OpenRailwayMap (Still under construction.)
 - Fixed minor bugs
 
 ## To-Do:
