@@ -17,3 +17,5 @@ This is a fork of [bahnbilder.ch](https://github.com/davidgubler/bahnbilder.ch).
 - User registration
 - More user friendly setup
 Suggest more features in our [Telegram](https://t.me/lidnyonline)
+
+Licensed under the [AGPL 3.0 license](https://www.gnu.org/licenses/agpl-3.0.en.html)
