@@ -1,8 +1,8 @@
 # Hey, this is LiDNY Rail Pictures
 
-Join our [discord](https://ldn.to/discord)
-
 This is a fork of [bahnbilder.ch](https://github.com/davidgubler/bahnbilder.ch).
+
+[How to setup](https://github.com/LiDNY/rp.lidny/wiki/Running)
 
 ## Current changes from bahnbilder.ch
 
@@ -15,5 +15,5 @@ This is a fork of [bahnbilder.ch](https://github.com/davidgubler/bahnbilder.ch).
 - Fix bugs (there is a lot, cause we cant code for shit)
 - More customization
 - User registration
-
-[How to setup](https://github.com/LiDNY/rp.lidny/wiki/Running)
+- More user friendly setup
+Suggest more features in our [Telegram](https://t.me/lidnyonline)
