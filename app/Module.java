@@ -16,7 +16,6 @@ public class Module extends AbstractModule {
         bind(Railinfo.class).asEagerSingleton();
         bind(Travelogues.class);
         bind(Photos.class);
-        bind(Calendars.class);
         bind(Countries.class);
         bind(Operators.class);
         bind(VehicleClasses.class);
@@ -24,7 +23,6 @@ public class Module extends AbstractModule {
         bind(Keywords.class);
         bind(UsersModel.class).to(MongoDbUsersModel.class).asEagerSingleton();
         bind(CountriesModel.class).to(MongoDbCountriesModel.class).asEagerSingleton();
-        bind(CalendarOrdersModel.class).to(MongoDbCalendarOrdersModel.class).asEagerSingleton();
         bind(KeywordsModel.class).to(MongoDbKeywordsModel.class).asEagerSingleton();
         bind(OperatorsModel.class).to(MongoDbOperatorsModel.class).asEagerSingleton();
         bind(PhotoTypesModel.class).to(MongoDbPhotoTypesModel.class).asEagerSingleton();

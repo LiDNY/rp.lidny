@@ -33,7 +33,7 @@ public class HomeController extends Controller {
         }
         String url;
         if (dstHost == null) {
-            url = "http://localhost:9000" + returnUrl;
+            url = "http://rp.lidny.org" + returnUrl; // change me too plez
         } else {
             url = "https://" + dstHost + returnUrl;
         }

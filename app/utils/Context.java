@@ -54,10 +54,6 @@ public class Context {
         return models.getInstance(clazz);
     }
 
-    public CalendarOrdersModel getCalendarOrdersModel() {
-        return getContextModel(ContextCalendarOrdersModel.class);
-    }
-
     public CountriesModel getCountriesModel() {
         return getContextModel(ContextCountriesModel.class);
     }
