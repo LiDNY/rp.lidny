@@ -55,24 +55,6 @@ public class Txt {
         en.put("browse", "Browse");
         de.put("browse", "Durchsuchen");
 
-        en.put("calendar", "Calendar");
-        de.put("calendar", "Kalender");
-
-        en.put("calendarOrder", "Order calendars");
-        de.put("calendarOrder", "Kalender bestellen");
-
-        en.put("calendarMoreInformation", "More information about this and future calendars is available at https://rail.pictures/calendar");
-        de.put("calendarMoreInformation", "Weitere Informationen zu diesem und zukünftigen Kalendern findest du unter https://bahnbilder.ch/calendar");
-
-        en.put("calendarOrdered", "ordered from rail.pictures");
-        de.put("calendarOrdered", "bestellt bei bahnbilder.ch");
-
-        en.put("calendarOrderedYouHave", "You have ordered the following calendar(s)");
-        de.put("calendarOrderedYouHave", "Du hast die folgenden Kalender bestellt");
-
-        en.put("calendarThanksForOrder", "Thank you for your order! We hope you enjoy our calendar and have a merry christmas!");
-        de.put("calendarThanksForOrder", "Vielen Dank für die Bestellung! Wir wünschen viel Freude und frohe Weihnachten!");
-
         en.put("team", "The rail.pictures team");
         de.put("team", "Das Team von bahnbilder.ch");
 
@@ -355,9 +337,6 @@ public class Txt {
         en.put("nr", "Number");
         de.put("nr", "Nummer");
 
-        en.put("nrOfCalendars", "Number of Calendars");
-        de.put("nrOfCalendars", "Anzahl Kalender");
-
         en.put("operator", "Operator");
         de.put("operator", "Betreiber");
 
@@ -366,15 +345,6 @@ public class Txt {
 
         en.put("operatorsNoWikidata", "Operators without Wikidata");
         de.put("operatorsNoWikidata", "Betreiber ohne Wikidata");
-
-        en.put("orderConfirm", "Confirm Order");
-        de.put("orderConfirm", "Bestellung bestätigen");
-
-        en.put("orderPreview", "Order preview");
-        de.put("orderPreview", "Bestellungs-Vorschau");
-
-        en.put("orderSend", "Send Order");
-        de.put("orderSend", "Bestellung absenden");
 
         en.put("other", "Other");
         de.put("other", "Anderes");
