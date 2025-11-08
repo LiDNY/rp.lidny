@@ -11,6 +11,10 @@ This is a fork of [bahnbilder.ch](https://github.com/davidgubler/bahnbilder.ch).
 - Fixed minor bugs
 - Other minor changes
 
+## Issues
+
+- Vertical phone images get flipped sometimes (Depends on phone)
+
 ## To-Do:
 
 - Fix bugs (there is a lot, cause we cant code for shit)
