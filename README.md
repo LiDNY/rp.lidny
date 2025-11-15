@@ -13,7 +13,7 @@ This is a fork of [bahnbilder.ch](https://github.com/davidgubler/bahnbilder.ch).
 
 ## Issues
 
-- Vertical phone images get flipped sometimes (Depends on phone)
+- Vertical phone images get flipped sometimes (Depends on device)
 
 ## To-Do:
 
