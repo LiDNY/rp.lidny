@@ -400,6 +400,9 @@ public class Txt {
         en.put("reallyDelete", "Yes, delete it!");
         de.put("reallyDelete", "Ja, löschen!");
 
+        en.put("requestStats", "Request Statistics");
+        de.put("requestStats", "Request-Statistik");
+
         en.put("save", "Save");
         de.put("save", "Speichern");
 
@@ -415,15 +418,6 @@ public class Txt {
         en.put("share", "Share");
         de.put("share", "Weiterleiten");
 
-        en.put("shippingCost", "Shipping cost");
-        de.put("shippingCost", "Versandkosten");
-
-        en.put("shippingDate", "Shipping date");
-        de.put("shippingDate", "Versandzeitpunkt");
-
-        en.put("shippingDateDesc", "Shipped ca. 1 week before 24th of December for delivery before christmas");
-        de.put("shippingDateDesc", "Postaufgabe ca. 1 Woche vor dem 24. Dezember für Lieferung vor Weihnachten");
-
         en.put("showDetails", "Show details");
         de.put("showDetails", "Details anzeigen");
 
@@ -433,8 +427,8 @@ public class Txt {
         en.put("showList", "Show as list");
         de.put("showList", "Liste zeigen");
 
-        en.put("siteName", "rail.pictures");
-        de.put("siteName", "bahnbilder.ch");
+        en.put("siteName", "rp.lidny.org");
+        de.put("siteName", "rp.lidny.org");
 
         en.put("solutions", "Solutions");
         de.put("solutions", "Lösungen");

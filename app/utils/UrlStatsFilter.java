@@ -28,7 +28,11 @@ public class UrlStatsFilter extends Filter {
             return;
         }
         String uri = request.uri();
-        if (uri.startsWith("/assets/") || uri.startsWith("/favicon.") || uri.startsWith("/lang") || uri.contains("/_")) {
+        if (uri.startsWith("/assets/") ||
+            uri.startsWith("/flags/") ||
+            uri.startsWith("/favicon.") ||
+            uri.startsWith("/lang") ||
+            uri.contains("/_")) {
             // filter some technical URIs that aren't interesting at all
             return;
         }
@@ -53,9 +57,31 @@ public class UrlStatsFilter extends Filter {
         Matcher scaledUrlMatcher = SCALED_URI.matcher(uri);
         if (scaledUrlMatcher.matches()) {
             uri = "/photos/*/" + scaledUrlMatcher.group(3);
-            if (referer != null && (referer.startsWith("bahnbilder.ch/") || referer.startsWith("rail.pictures/") || referer.startsWith("localhost:9000/"))) {
-                referer = null;
+            if (referer != null) {
+                if (Config.Option.HOST_DE.get() != null) {
+                    if (referer.equals(Config.Option.HOST_DE.get()) || referer.startsWith(Config.Option.HOST_DE.get() + "/")) {
+                        referer = null;
+                    }
+                }
+                if (Config.Option.HOST_EN.get() != null) {
+                    if (referer.equals(Config.Option.HOST_EN.get()) || referer.startsWith(Config.Option.HOST_EN.get() + "/")) {
+                        referer = null;
+                    }
+                }
             }
+        }
+
+        // we don't care about language switcher referers
+        if (referer != null && Config.Option.HOST_DE.get() != null && referer.startsWith(Config.Option.HOST_DE.get() + "/lang")) {
+            referer = null;
+        }
+        if (referer != null && Config.Option.HOST_EN.get() != null && referer.startsWith(Config.Option.HOST_EN.get() + "/lang")) {
+            referer = null;
+        }
+
+        if (uri.startsWith("/picture/")) {
+            // combine legacy uri
+            uri = uri.substring(8);
         }
 
         Context.get(request).getRequestsDailyModel().track(uri, referer);
