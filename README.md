@@ -1,5 +1,6 @@
 <img width="1600" height="296" alt="lidny_rp_gh_welcome" src="https://github.com/user-attachments/assets/d60ee9f9-f3de-4b4e-bc4b-19ac52250b43" />
 
+-------------------
 This is a fork of [bahnbilder.ch](https://github.com/davidgubler/bahnbilder.ch).
 
 [How to setup](https://github.com/LiDNY/rp.lidny/wiki/Running)
