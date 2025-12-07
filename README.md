@@ -3,7 +3,7 @@
 -------------------
 This is a fork of [bahnbilder.ch](https://github.com/davidgubler/bahnbilder.ch).
 
-[How to setup](https://github.com/LiDNY/rp.lidny/wiki/Running)
+[How to setup](https://docs.lidny.org/Rail%20Pictures/Setup/) | [Mirror](https://github.com/LiDNY/rp.lidny/wiki/Running)
 
 ## Current changes from bahnbilder.ch
 
