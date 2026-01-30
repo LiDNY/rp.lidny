@@ -220,4 +220,29 @@ public class ContextPhotosModel extends ContextModel implements PhotosModel {
     public List<String> getPhotographers() {
         return call(() -> photosModel.getPhotographers());
     }
+
+    @Override
+    public Integer getMostCommonVehicleClassByCountry(Country country) {
+        return call(() -> photosModel.getMostCommonVehicleClassByCountry(country));
+    }
+
+    @Override
+    public int getVehicleClassCountByCountry(Country country) {
+        return call(() -> photosModel.getVehicleClassCountByCountry(country));
+    }
+
+    @Override
+    public int getVehicleCountByCountry(Country country) {
+        return call(() -> photosModel.getVehicleCountByCountry(country));
+    }
+
+    @Override
+    public List<? extends OperatorVehicleClass> getLatestVehicleClassIdAdditionsByCountry(Country country) {
+        return call(() -> photosModel.getLatestVehicleClassIdAdditionsByCountry(country));
+    }
+
+    @Override
+    public Map<Integer, Integer> getOperatorCountByCountry(Country country) {
+        return call(() -> photosModel.getOperatorCountByCountry(country));
+    }
 }

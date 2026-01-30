@@ -22,6 +22,7 @@ import dev.morphia.aggregation.stages.Group;
 import dev.morphia.aggregation.stages.Sort;
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Transient;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.MorphiaCursor;
 import dev.morphia.query.Query;
@@ -37,6 +38,7 @@ import entities.mongodb.MongoDbPhotoExif;
 import entities.mongodb.MongoDbPhoto;
 import entities.mongodb.aggregations.MongoDbAggregationCountryViews;
 import models.*;
+import utils.Context;
 import utils.geometry.GeographicCoordinates;
 import utils.geometry.SimplePoint;
 
@@ -116,7 +118,6 @@ public class MongoDbPhotosModel extends MongoDbModel<MongoDbPhoto> implements Ph
 
     @Override
     public List<Photo> getFeatured(VehicleClassesModel vehicleClassesModel, VehicleTypesModel vehicleTypesModel) {
-        long start = System.currentTimeMillis();
         List<AggregationDate> lastAggregationDates = mongoDb.getDs().aggregate(MongoDbPhoto.class)
                 .match(Filters.ne("photoDate", null), Filters.ne("vehicleClassId", null), Filters.ne("locationId", null))
                 .group(Group.group().field("_id", DateExpressions.dateToString().date("$photoDate").format("%Y-%m-%d")))
@@ -340,6 +341,24 @@ public class MongoDbPhotosModel extends MongoDbModel<MongoDbPhoto> implements Ph
                     Filters.and(
                             Filters.eq("authorRating", photo.getAuthorRating()),
                             Filters.eq("views", photo.getViews()),
+                            getFilter("numId", photo.getId(), forward)
+                    )));
+        } else if (search.getSortBy() == Search.SortBy.photoType) {
+            query = query.filter(Filters.or(
+                    getFilter("photoTypeId", photo.getPhotoTypeId(), !forward),
+                    Filters.and(
+                            Filters.eq("photoTypeId", photo.getPhotoTypeId()),
+                            getFilter("authorRating", photo.getAuthorRating(), forward)
+                    ),
+                    Filters.and(
+                            Filters.eq("photoTypeId", photo.getPhotoTypeId()),
+                            Filters.eq("authorRating", photo.getAuthorRating()),
+                            getFilter("photoDate", photo.getPhotoDate(), forward)
+                    ),
+                    Filters.and(
+                            Filters.eq("photoTypeId", photo.getPhotoTypeId()),
+                            Filters.eq("authorRating", photo.getAuthorRating()),
+                            Filters.eq("photoDate", photo.getPhotoDate()),
                             getFilter("numId", photo.getId(), forward)
                     )));
         } else {
@@ -769,17 +788,6 @@ public class MongoDbPhotosModel extends MongoDbModel<MongoDbPhoto> implements Ph
         if (photo == null || photo.getCountryId() == null) {
             return Collections.emptyMap();
         }
-
-        /*for (Photo p : query()
-                .filter(Filters.ne("numId", photo.getId()))
-                .filter(Filters.ne("operatorId", null))
-                .filter(Filters.eq("countryId", photo.getCountryId()))
-                .filter(Filters.eq("texts", text))
-                .stream(new FindOptions()).toList() ) {
-            Operator o = operatorsModel.get(p.getOperatorId());
-            System.out.println("photo " + p.getId() + " with operator " + o + " matches text " + text);
-        }*/
-
         return query()
                 .filter(Filters.ne("numId", photo.getId()))
                 .filter(Filters.ne("operatorId", null))
@@ -811,6 +819,61 @@ public class MongoDbPhotosModel extends MongoDbModel<MongoDbPhoto> implements Ph
         return cursor.hasNext() ? cursor.next().distinct.stream().sorted().toList() : Collections.emptyList();
     }
 
+    @Override
+    public Integer getMostCommonVehicleClassByCountry(Country country) {
+        List<AggregationCount> l = mongoDb.getDs().aggregate(MongoDbPhoto.class)
+                .match(Filters.eq("countryId", country.getId()), Filters.ne("vehicleClassId", null))
+                .group(Group.group().field("_id", Expressions.field("vehicleClassId")).field("count", AccumulatorExpressions.sum(Expressions.value(1))))
+                .sort(Sort.sort().descending("count"))
+                .limit(1)
+                .execute(AggregationCount.class).toList();
+        return l.stream().map(AggregationCount::getId).findFirst().orElse(null);
+    }
+
+    @Override
+    public int getVehicleClassCountByCountry(Country country) {
+        AggregationDistinct<Integer> x = mongoDb.getDs().aggregate(MongoDbPhoto.class)
+                .match(Filters.eq("countryId", country.getId()), Filters.ne("vehicleClassId", null))
+                .group(Group.group().field("_id", null).field("distinct", AccumulatorExpressions.addToSet(Expressions.field("vehicleClassId"))))
+                .execute(AggregationDistinct.class)
+                .tryNext();
+        return x == null ? 0 : x.distinct.size();
+    }
+
+    @Override
+    public int getVehicleCountByCountry(Country country) {
+        AggregationDistinct x = mongoDb.getDs().aggregate(MongoDbPhoto.class)
+                .match(Filters.eq("countryId", country.getId()), Filters.ne("vehicleClassId", null), Filters.ne("nr", null))
+                .group(Group.group().field("_id", null).field("distinct", AccumulatorExpressions.addToSet(Expressions.document().field("vehicleClassId", Expressions.field("vehicleClassId")).field("nr", Expressions.field("nr")))))
+                .execute(AggregationDistinct.class)
+                .tryNext();
+        return x == null ? 0 : x.distinct.size();
+    }
+
+    @Override
+    public List<? extends OperatorVehicleClass> getLatestVehicleClassIdAdditionsByCountry(Country country) {
+        List<AggregationDateByOperatorVehicleClassId> l = mongoDb.getDs().aggregate(MongoDbPhoto.class)
+                .match(Filters.eq("countryId", country.getId()), Filters.ne("vehicleClassId", null), Filters.ne("operatorId", null), Filters.ne("uploadDate", null))
+                .group(Group.group().field("_id",
+                        Expressions.document()
+                                .field("operatorId", Expressions.field("operatorId"))
+                                .field("vehicleClassId", Expressions.field("vehicleClassId"))
+                ).field("date", AccumulatorExpressions.min(Expressions.field("uploadDate"))))
+                .sort(Sort.sort().descending("date"))
+                .limit(5)
+                .execute(AggregationDateByOperatorVehicleClassId.class).toList();
+        return l.stream().map(AggregationDateByOperatorVehicleClassId::getId).toList();
+    }
+
+    @Override
+    public Map<Integer, Integer> getOperatorCountByCountry(Country country) {
+        List<AggregationCount> l = mongoDb.getDs().aggregate(MongoDbPhoto.class)
+                .match(Filters.eq("countryId", country.getId()), Filters.ne("operatorId", null))
+                .group(Group.group().field("_id", Expressions.field("operatorId")).field("count", AccumulatorExpressions.sum(Expressions.value(1))))
+                .execute(AggregationCount.class).toList();
+        return l.stream().collect(Collectors.toMap(AggregationCount::getId, AggregationCount::getCount));
+    }
+
     @Entity
     private static class AggregationDate {
         @Id
@@ -832,5 +895,110 @@ public class MongoDbPhotosModel extends MongoDbModel<MongoDbPhoto> implements Ph
         private Object _id;
 
         List<T> distinct;
+    }
+
+    @Entity
+    protected static class AggregationCount {
+        @Id
+        private int _id;
+
+        public int getId() {
+            return _id;
+        }
+
+        int count;
+
+        public int getCount() {
+            return count;
+        }
+
+        @Override
+        public String toString() {
+            return _id + ": " + count;
+        }
+    }
+
+    @Entity
+    private static class AggregationDateByInt {
+        @Id
+        private int _id;
+
+        private LocalDateTime date;
+
+        public int getId() {
+            return _id;
+        }
+
+        public LocalDateTime getDate() {
+            return date;
+        }
+    }
+
+    @Entity
+    private static class AggregationDateByOperatorVehicleClassId {
+        @Id
+        private MongoDbOperatorVehicleClassId _id;
+
+        private LocalDateTime date;
+
+        public MongoDbOperatorVehicleClassId getId() {
+            return _id;
+        }
+
+        public LocalDateTime getDate() {
+            return date;
+        }
+    }
+
+    @Entity
+    private static class MongoDbOperatorVehicleClassId implements OperatorVehicleClass, ContextAwareEntity {
+        @Id
+        private Object _id;
+
+        private int operatorId;
+
+        private int vehicleClassId;
+
+        @Transient
+        private Context context;
+
+        @Override
+        public void inject(Context context) {
+            this.context = context;
+        }
+
+        public int getOperatorId() {
+            return operatorId;
+        }
+
+        public int getVehicleClassId() {
+            return vehicleClassId;
+        }
+
+        @Transient
+        private Operator operator;
+
+        public Operator getOperator() {
+            if (operator == null) {
+                this.operator = context.getOperatorsModel().get(operatorId);
+            }
+            return operator;
+        }
+
+        @Transient
+        public VehicleClass vehicleClass;
+
+        public VehicleClass getVehicleClass() {
+            if (vehicleClass == null) {
+                this.vehicleClass = context.getVehicleClassesModel().get(vehicleClassId);
+            }
+            return vehicleClass;
+        }
+
+        @Override
+        public String toString() {
+            String abbr = getOperator().getAbbr();
+            return abbr + " " + getVehicleClass().getName().replace(" Typ " + abbr, "").replace(abbr + " ", "");
+        }
     }
 }

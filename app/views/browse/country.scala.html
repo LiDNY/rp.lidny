@@ -1,0 +1,122 @@
+@(  implicit request: Http.Request,
+    titlePhoto: entities.Photo,
+    featuredOperators: List[_ <: entities.Operator],
+    otherOperators: List[_ <: entities.Operator],
+    vehicleClassCount: Integer,
+    vehicleCount: Integer,
+    photoCount: Long,
+    latestVehicleClasses: List[_ <: entities.OperatorVehicleClass],
+    search: entities.ModelSearch,
+    lastPage: Integer,
+    results: List[_ <: entities.Photo],
+    user: entities.User,
+    lang: String
+)
+
+
+@template(request, search.getCountry().getName(lang), "browse", user, lang) {
+} {
+    <script src='@routes.Assets.versioned("javascripts/multiedit.js")'></script>
+    <script src='@routes.Assets.versioned("javascripts/clickableanything.js")'></script>
+    @breadCrumbs("browse", search, true, true, lang)
+    <br />
+
+    <div class="row mb-4">
+        <div class="col-md-6 col-lg-4 order-md-2 mb-3">
+            <div style="background-color: #303030; padding: 20px">
+                <div style="text-align: center;">
+                    <h1>@search.getCountry().getName(lang)</h1>
+                </div>
+                <div class="mb-2" style="position: relative;">
+                    <div style="width: 30%; position: absolute; top: 0px; right: 0px;"><img src='/assets/images/flags/@{search.getCountry() + ""}.svg' title='@search.getCountry().getName(lang)' style="width: 100%;" /></div>
+                    <img src="@titlePhoto.getUrlPublic900()" style="max-width: 100%" />
+                </div>
+                <div>
+                    <table class="stats">
+                        <tr>
+                            <td>@i18n.Txt.get(lang, "operators")</td>
+                            <td style="width: auto">@(featuredOperators.size() + otherOperators.size())</td>
+                        </tr>
+                        <tr>
+                            <td>@i18n.Txt.get(lang, "vclasses")</td>
+                            <td style="width: auto">@vehicleClassCount</td>
+                        </tr>
+                        <tr>
+                            <td>@i18n.Txt.get(lang, "vehicles")</td>
+                            <td style="width: auto">@vehicleCount</td>
+                        </tr>
+                        <tr>
+                            <td>@i18n.Txt.get(lang, "photos")</td>
+                            <td style="width: auto">@photoCount</td></td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align: top">@i18n.Txt.get(lang, "lastAdded")</td>
+                            <td style="width: auto">
+                                @for(operatorVehicleClass <- latestVehicleClasses) {
+                                    <a href="@routes.BrowseController.vehicleClass(1, search.getCountry() + "", operatorVehicleClass.getOperator().getId(), operatorVehicleClass.getVehicleClass().getId())">@operatorVehicleClass</a><br />
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-8">
+            @if(!featuredOperators.isEmpty()) {
+            <div style="background-color: #303030; padding: 20px">
+                <div>
+                    <table style="width: 100%;">
+                        @for(operator <- featuredOperators) {
+                            <tr class="clickable" style="height: 30px;" data-href="@routes.BrowseController.operator(1, search.getCountry + "", operator.getId)">
+                                <td style="padding-right: 20px; text-align: center;">
+                                    @if(operator.getLogoUrl() != null) {
+                                        <img src="@operator.getLogoUrl()" style="max-height: 24px; max-width: 100px;"/>
+                                    }
+                                </td>
+                                <td style="padding-right: 20px;">
+                                    <a href="@routes.BrowseController.operator(1, search.getCountry  + "", operator.getId)">@operator.getAbbr()</a>
+                                </td>
+                                <td>
+                                    <a href="@routes.BrowseController.operator(1, search.getCountry + "", operator.getId)">@operator.getName()</a>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+    @if(!otherOperators.isEmpty()) {
+    <div class="row mb-3">
+        <div class="col-12">
+            <div>
+                <h3>@i18n.Txt.get(lang, "more")</h3>
+                <div class="columns">
+                    @for(operator <- otherOperators) {
+                        <a  href="@routes.BrowseController.operator(1, search.getCountry + "", operator.getId)">@operator.getName()</a><br />
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+
+    <div class='row'>
+        <div class='col-12'>
+            @pageChooser(routes.BrowseController.country(1, search.getCountry + "").toString, search.getPage, lastPage)
+            <div class='fleximages'>
+                <div class="multiedit">
+                    <span id="multiedit"><i class="fas fa-edit"></i></span>
+                </div>
+                @for(photo <- results) {
+                    <a @if(user != null && user.canEdit(photo)){id='editable-@photo.getId()' class='editable'} style="--w: @photo.getResMedium.getWidth; --h: @photo.getResMedium.getHeight; position: relative" href="/@photo.getId()?menu=browse&@search.toQuery()">
+                        <img src="@photo.getUrlPublic900()">
+                        <div class='bottom-label'>@photo.getGeneratedDescription(lang, true, false, true, true, false)</div>
+                    </a>
+                }
+            </div>
+            @pageChooser(routes.BrowseController.country(1, search.getCountry + "").toString, search.getPage, lastPage)
+        </div>
+    </div>
+}

@@ -13,9 +13,11 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Collection;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
+import java.util.List;
 
 public class MongoDbWikidataModel extends MongoDbModel<MongoDbWikidata> implements WikidataModel {
 
@@ -33,7 +35,6 @@ public class MongoDbWikidataModel extends MongoDbModel<MongoDbWikidata> implemen
                 return null;
             }
             if (httpResponse.statusCode() < 200 || httpResponse.statusCode() >= 300) {
-                System.out.print(new String(httpResponse.body()));
                 throw new CompletionException("HTTP response " + httpResponse.statusCode(), null);
             }
             try {
@@ -70,5 +71,10 @@ public class MongoDbWikidataModel extends MongoDbModel<MongoDbWikidata> implemen
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<Wikidata> get(Collection<String> ids) {
+        return ids.stream().map(this::get).toList();
     }
 }
