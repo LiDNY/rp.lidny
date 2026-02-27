@@ -22,6 +22,7 @@ n/a
 - More customization
 - User registration
 - More user friendly setup
+- Video
 - Add all stuff from main branch 
 
 Suggest more features in our [Telegram](https://t.me/lidnyonline)
