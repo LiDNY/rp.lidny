@@ -78,7 +78,7 @@ public class MongoDbUsersModel extends MongoDbModel<MongoDbUser> implements User
             }
         }
         Session session = user.getSessions().stream().filter(s -> s.getSessionId().equals(sessionId)).collect(Collectors.toList()).get(0);
-        if (session.getLastActive().getTime() < (new Date().getTime() - LAST_ACTIVE_REFRESH_MS)) {
+        if (session.getLastActive().getTime() < (new Date().getTime() - LAST_ACTIVE_REFRESH_MS) && mongoDb.isWritable()) {
             ((MongoDbSession)session).setLastActive(new Date());
             query().filter(Filters.eq("sessions.sessionId", sessionId)).update(new UpdateOptions(), UpdateOperators.set("sessions.$.lastActive", session.getLastActive()));
         }
@@ -116,6 +116,11 @@ public class MongoDbUsersModel extends MongoDbModel<MongoDbUser> implements User
         ops.add(UpdateOperators.set("passwordSalt", mongoDbUser.getPasswordSalt()));
         ops.add(UpdateOperators.set("passwordHash", mongoDbUser.getPasswordHash()));
         query(user).update(new UpdateOptions(), ops.toArray(UpdateOperator[]::new));
+    }
+
+    @Override
+    public void delete(User user) {
+        super.delete((MongoDbUser)user);
     }
 
     @Override
