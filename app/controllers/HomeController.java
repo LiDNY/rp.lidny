@@ -1,7 +1,6 @@
 package controllers;
 
 import entities.Photo;
-import entities.Travelogue;
 import entities.User;
 import entities.aggregations.AggregationCountryViews;
 import i18n.Lang;
@@ -20,10 +19,9 @@ public class HomeController extends Controller {
         String lang = Lang.get(request);
 
         List<Photo> featured = context.getPhotosModel().getFeatured(context.getVehicleClassesModel(), context.getVehicleTypesModel());
-        List<? extends Travelogue> travelogues = context.getTraveloguesModel().getFeatured();
         List<? extends AggregationCountryViews> countryViews = context.getPhotosModel().getTopCountryIdsByViews();
 
-        return ok(views.html.home.render(request, featured, travelogues, countryViews, Config.Option.CALENDAR_ORDER_AVAILABLE.getBool(), user, lang));
+        return ok(views.html.home.render(request, featured, countryViews, user, lang));
     }
 
     public Result lang(Http.Request request, String lang, String returnUrl) {
@@ -33,7 +31,7 @@ public class HomeController extends Controller {
         }
         String url;
         if (dstHost == null) {
-            url = "http://localhost:9000" + returnUrl;
+            url = returnUrl;
         } else {
             url = "https://" + dstHost + returnUrl;
         }

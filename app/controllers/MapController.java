@@ -37,7 +37,7 @@ public class MapController extends Controller {
         injector.injectMembers(search);
 
 
-        return ok(views.html.map.view.render(request, search, Config.Option.GOOGLE_MAPS_JS_KEY.get(), user, lang));
+        return ok(views.html.map.view.render(request, search, user, lang));
     }
 
     public Result markers(Http.Request request) {
@@ -68,7 +68,7 @@ public class MapController extends Controller {
         }
         Context context = Context.get(request);
         String lang = Lang.get(request);
-        return ok("var txtMore = \"" + Txt.get(lang, "more") + "\";\nvar mapsKey = \"" + Config.Option.GOOGLE_MAPS_JS_KEY.get() + "\";").as(Http.MimeTypes.JAVASCRIPT);
+        return ok("var txtMore = \"" + Txt.get(lang, "more") + "\";\n").as(Http.MimeTypes.JAVASCRIPT);
     }
 
     private static class Marker {

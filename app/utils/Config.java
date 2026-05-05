@@ -38,17 +38,8 @@ public class Config {
         MAIL_USERNAME, // used by conf/application.conf
         MAIL_PASSWORD, // used by conf/application.conf
         MAIL_PORT,     // used by conf/application.conf
-        CALENDAR_EMAIL,
-        CALENDAR_ORDER_AVAILABLE,
-        CALENDAR_YEAR,
-        CALENDAR_PRICE_CHF,
-        CALENDAR_PRICE_EUR,
-        CALENDAR_SHIPPING_CHF,
-        CALENDAR_SHIPPING_EUR,
         HOST_DE,
         HOST_EN,
-        GOOGLE_MAPS_JS_KEY,
-        GOOGLE_MAPS_SERVER_KEY,
         LIVEFILES_HOSTNAME,
         MAC_SIGNING_KEY,
         MONGO_HOSTS,

@@ -1,24 +1,14 @@
 @(  implicit request: Http.Request,
     featured: List[entities.Photo],
-    travelogues: List[_ <: entities.Travelogue],
     countryViews: List[_ <: entities.aggregations.AggregationCountryViews],
-    calendarBanner: Boolean,
     user: entities.User,
     lang: String,
 )
 
 @template(request, if(lang=="en"){"rail.pictures"}else{"bahnbilder.ch"}, "home", user, lang) {
 } {
-    @if(calendarBanner) {
-        <div class="row">
-            <div class="col-12 mb-4" style="text-align: center;">
-                <a href="@routes.CalendarController.view()"><img src="/assets/images/calendar/banner.jpg" style="width: 100%; max-width: 640px; max-height: 80px; "></a>
-            </div>
-        </div>
-    }
-
     <div class="row">
-        <div class="col-md-6 order-md-2">
+        <div class="col-md-9 order-md-1">
             @for(photo <- featured) {
                 <div class="featured">
                     <h2>@photo.getVehicleClass</h2>
@@ -28,27 +18,14 @@
             }
         </div>
 
-        <div class="col-md-3 order-md-1 sidebar">
-            <h2>Reiseberichte</h2>
-            @for(travelogue <- travelogues) {
-                <a class="divButton" href="@routes.TraveloguesController.view(travelogue.getId)">
-                    <div>
-                        <h2>@travelogue.getTitle()</h2>
-                        <hr />
-                        <img src="@travelogue.getTitlePhoto().getUrlPublic200()" srcset="@travelogue.getTitlePhoto().getUrlPublic900() 900w" />@utils.StringUtils.limitText(travelogue.getSummary(), 280)
-                    </div>
-                </a>
-            }
-        </div>
 
-
-        <div class="col-md-3 order-md-3 sidebar">
+        <div class="col-md-3 order-md-2 sidebar">
             <h2>@i18n.Txt.get(lang, "countriesByViews")</h2>
             <table class="stats">
                 @for(cv <- countryViews) {
                     <tr>
                         <td><span><a href="@routes.BrowseController.country(1, cv.getCountry + "")" >@flag(cv.getCountry() + "", cv.getCountry().getName(lang))@cv.getCountry().getName(lang)</a></span></td>
-                        <td>@(cv.getViews() / 1000L)&nbsp;k</td>
+                        <td>@if(cv.getViews() < 1000L){@cv.getViews()}else if(cv.getViews() < 1000000L){@(cv.getViews() / 1000L)&nbsp;k}else{@(cv.getViews() / 1000000L)&nbsp;m}</td>
                     </tr>
                 }
             </table>

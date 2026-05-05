@@ -29,18 +29,16 @@ var positionMap = function(location, country) {
 		zoom = 5;
 	}
 	if (addr) {
-		geocoder.geocode({
-			'address' : addr
-	}, function(results, status) {
-		if (status == google.maps.GeocoderStatus.OK) {
-			editmap.panTo(results[0].geometry.location);
-			editmap.setZoom(zoom);
-		}
-		});
+        fetch("https://nominatim.openstreetmap.org/search?format=json&q=" + encodeURIComponent(addr))
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    editmap.setView([parseFloat(data[0].lat), parseFloat(data[0].lon)], zoom);
+                }
+            })
+            .catch(err => console.error(err));
 	} else {
-	var myLatlng = new google.maps.LatLng(47, 8);
-		editmap.setZoom(6);
-		editmap.panTo(myLatlng);
+		editmap.setView([47, 8], 6);
 	}
 };
 
@@ -58,37 +56,36 @@ var updateMap = function() {
 
 $(document).ready(function() {
 	// initialize map
-	geocoder = new google.maps.Geocoder();
-	var mapOptions = {
-		mapTypeId : google.maps.MapTypeId.HYBRID,
-	};
-	editmap = new google.maps.Map(document.getElementById('editmap'), mapOptions);
-	google.maps.event.addListener(editmap, 'click', function(event) {
+	editmap = L.map('editmap');
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(editmap);
+
+	editmap.on('click', function(event) {
 		if (marker) {
-			marker.setPosition(event.latLng);
+			marker.setLatLng(event.latlng);
 		} else {
-			marker = new google.maps.Marker({
-				position : event.latLng,
-				map : editmap,
-				draggable : true,
-			});
+			marker = L.marker(event.latlng, { draggable: true }).addTo(editmap);
+            marker.on('dragend', function(e) {
+                $('#lat').val(e.target.getLatLng().lat);
+                $('#lng').val(e.target.getLatLng().lng);
+            });
 		}
-		$('#lat').val(event.latLng.lat());
-		$('#lng').val(event.latLng.lng())
+		$('#lat').val(event.latlng.lat);
+		$('#lng').val(event.latlng.lng)
 	});
 
 	// set marker to correct starting position
 	var latitude = $('#lat').val();
 	var longitude = $('#lng').val();
 	if (latitude && longitude) {
-		var markerPos = new google.maps.LatLng(latitude, longitude);
-		marker = new google.maps.Marker({
-			position : markerPos,
-			map : editmap,
-			draggable : true,
-		});
-		editmap.panTo(markerPos);
-		editmap.setZoom(18);
+		marker = L.marker([latitude, longitude], { draggable: true }).addTo(editmap);
+        marker.on('dragend', function(e) {
+            $('#lat').val(e.target.getLatLng().lat);
+            $('#lng').val(e.target.getLatLng().lng);
+        });
+		editmap.setView([latitude, longitude], 18);
 	} else {
 		updateMap();
 	}

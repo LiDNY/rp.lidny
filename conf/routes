@@ -25,16 +25,6 @@ GET     /search                                         controllers.SearchContro
 POST    /search                                         controllers.SearchController.searchPost(request: Request)
 GET     /search/_locations                              controllers.SearchController.locations(request: Request, country: Integer ?= null)
 
-GET     /travelogues                                    controllers.TraveloguesController.list(request: Request, yearMonth: String = null)
-GET     /travelogues/:yearMonth                         controllers.TraveloguesController.list(request: Request, yearMonth: String)
-GET     /travelogue/_create                             controllers.TraveloguesController.create(request: Request)
-POST    /travelogue/_create                             controllers.TraveloguesController.createPost(request: Request)
-GET     /travelogue/:id                                 controllers.TraveloguesController.view(request: Request, id: Integer)
-GET     /travelogue/:id/_edit                           controllers.TraveloguesController.edit(request: Request, id: Integer)
-POST    /travelogue/:id/_edit                           controllers.TraveloguesController.editPost(request: Request, id: Integer)
-GET     /travelogue/:id/_delete                         controllers.TraveloguesController.delete(request: Request, id: Integer)
-POST    /travelogue/:id/_delete                         controllers.TraveloguesController.deletePost(request: Request, id: Integer)
-GET     /travelogue/:id/_bb                             controllers.TraveloguesController.bb(request: Request, id: Integer)
 
 GET     /upload                                         controllers.UploadController.upload(request: Request)
 POST    /upload                                         controllers.UploadController.uploadPost(request: Request)
@@ -99,12 +89,6 @@ GET     /webcamzhb                                      controllers.WebcamContro
 GET     /about                                          controllers.AboutController.view(request: Request)
 GET     /privacy                                        controllers.AboutController.privacy(request: Request)
 GET     /status                                         controllers.AboutController.status(request: Request)
-
-GET     /calendar                                       controllers.CalendarController.view(request: Request)
-GET     /calendar/order                                 controllers.CalendarController.order(request: Request)
-POST    /calendar/order                                 controllers.CalendarController.orderPost(request: Request)
-GET     /calendar/orders                                controllers.CalendarController.list(request: Request)
-POST    /calendar/orders                                controllers.CalendarController.listPost(request: Request)
 
 GET     /photos/original/:id.jpg                        controllers.FilesController.original(request: Request, id: Integer)
 GET     /pictures/original/:id.jpg                      controllers.FilesController.original(request: Request, id: Integer)
