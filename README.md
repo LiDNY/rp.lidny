@@ -1,4 +1,6 @@
-This branch has been retired in favor of the brand new [re:start](https://github.com/LiDNY/rp.lidny/tree/restart) branch. This branch may ocassionally get updates, but nothing major is planned at this point.
+### This branch has been retired in favor of the brand new [re:start](https://github.com/LiDNY/rp.lidny/tree/restart) branch. This branch may ocassionally get updates, but nothing major is planned at this point.
+
+-------------------
 
 <img width="1600" height="296" alt="lidny_rp_gh_welcome" src="https://github.com/user-attachments/assets/d60ee9f9-f3de-4b4e-bc4b-19ac52250b43" />
 
