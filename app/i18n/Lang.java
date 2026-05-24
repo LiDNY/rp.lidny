@@ -22,6 +22,6 @@ public class Lang {
                 return "en";
             }
         }
-        return "de";
+        return "en";
     }
 }

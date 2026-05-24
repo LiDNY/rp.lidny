@@ -7,7 +7,6 @@
     operators: List[_ <: entities.Operator],
     vehicleClasses: List[_ <: entities.VehicleClass],
     errors: Map[String, String],
-    mapsKey: String,
     user: entities.User
 )
 
@@ -18,7 +17,8 @@
     <script src='@routes.PhotoController.editConfig("0")'></script>
     <script src='@routes.Assets.versioned("tokenfield/bootstrap-tokenfield.min.js")'></script>
     <script src='@routes.Assets.versioned("javascripts/tokenfield-init.js")'></script>
-    <script src='https://maps.googleapis.com/maps/api/js?key=@mapsKey'></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@@1.9.4/dist/leaflet.js"></script>
     <script src='@routes.Assets.versioned("javascripts/manage.js")'></script>
     @form(request, routes.PhotoController.editPost(data.ids, data.returnUrl)) {
     <input type='hidden' name='lat' id='lat' value='@data.lat' />

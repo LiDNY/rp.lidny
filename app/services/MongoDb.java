@@ -68,13 +68,12 @@ public class MongoDb {
         System.out.println(replSetStatus == null ? "Replica set status not available" : replSetStatus);
 
         ds = Morphia.createDatastore(client, dbName, mapperOptions);
-        ds.getMapper().map(MongoDbCalendarOrder.class);
         ds.getMapper().map(MongoDbCountry.class);
         ds.getMapper().map(MongoDbKeyword.class);
         ds.getMapper().map(MongoDbLocation.class);
         ds.getMapper().map(MongoDbOperator.class);
         ds.getMapper().map(MongoDbPhotoType.class);
-        ds.getMapper().map(MongoDbTravelogue.class);
+
         ds.getMapper().map(MongoDbUser.class);
         ds.getMapper().map(MongoDbVehicleClass.class);
         ds.getMapper().map(MongoDbVehiclePropulsion.class);
