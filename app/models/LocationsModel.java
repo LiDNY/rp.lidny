@@ -24,4 +24,8 @@ public interface LocationsModel {
     Location getReverseLocation(Integer locationId);
 
     Map<Integer, ? extends Location> getByIdsAsMap(Collection<Integer> ids);
+
+    long deleteUnused(Collection<Integer> usedLocationIds);
+
+    Map<? extends Location, Float> searchFreeText(String freeText);
 }

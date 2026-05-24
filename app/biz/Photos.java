@@ -139,6 +139,9 @@ public class Photos {
         if (!"image/jpeg".equals(filePart.getContentType())) {
             throw new ValidationException(Map.of(fileName, ErrorMessages.PHOTO_WRONG_FORMAT));
         }
+        if (context.getFilesOriginalModel().exists(fileData)) {
+            throw new ValidationException(Map.of(fileName, ErrorMessages.PHOTO_ALREADY_UPLOADED));
+        }
         Exif exif = context.getPhotosModel().extractExif(fileData);
 
         // BUSINESS
@@ -235,9 +238,13 @@ public class Photos {
             locationId = location.getId();
         }
         context.getPhotosModel().update(data, dateTime, locationId, labelsToAdd, labelsToRemove);
+        long deletedLocations = context.getLocationsModel().deleteUnused(context.getPhotosModel().getLocationIds());
 
         // LOG
         logger.info(context.getRequest(), user + " updated " + data.photos);
+        if (deletedLocations > 0) {
+            logger.info(context.getRequest(), "Deleted " + deletedLocations + " unused locations");
+        }
     }
 
     // used for the autodetection feature

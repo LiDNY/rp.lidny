@@ -73,6 +73,8 @@ public interface PhotosModel {
 
     List<? extends Photo> search(Search search);
 
+    Stream<? extends Photo> searchAll(Search search);
+
     Photo getNext(Photo photo, Search search);
 
     Photo getPrev(Photo photo, Search search);
@@ -138,4 +140,6 @@ public interface PhotosModel {
     Map<Integer, Integer> getOperatorCountByCountry(Country country);
 
     Stream<MongoDbPhoto> getIncompleteAutodetectionCandidates();
+
+    List<Integer> getLocationIds();
 }

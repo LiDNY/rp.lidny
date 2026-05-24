@@ -93,6 +93,11 @@ public class ContextPhotosModel extends ContextModel implements PhotosModel {
     }
 
     @Override
+    public Stream<? extends Photo> searchAll(Search search) {
+        return call(() -> photosModel.searchAll(search));
+    }
+
+    @Override
     public Photo getNext(Photo photo, Search search) {
         return call(() -> photosModel.getNext(photo, search));
     }
@@ -255,5 +260,10 @@ public class ContextPhotosModel extends ContextModel implements PhotosModel {
     @Override
     public Stream<MongoDbPhoto> getIncompleteAutodetectionCandidates() {
         return call(() -> photosModel.getIncompleteAutodetectionCandidates());
+    }
+
+    @Override
+    public List<Integer> getLocationIds() {
+        return call(() -> photosModel.getLocationIds());
     }
 }

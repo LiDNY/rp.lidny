@@ -169,6 +169,9 @@ public class Txt {
         en.put(ErrorMessages.MISSING_VALUE, "Please fill in this field");
         de.put(ErrorMessages.MISSING_VALUE, "Bitte ausfüllen");
 
+        en.put(ErrorMessages.PHOTO_ALREADY_UPLOADED, "Photo was already uploaded");
+        de.put(ErrorMessages.PHOTO_ALREADY_UPLOADED, "Foto wurde bereits hochgeladen");
+
         en.put(ErrorMessages.PHOTO_INVALID_EXIF, "Photo has invalid EXIF data");
         de.put(ErrorMessages.PHOTO_INVALID_EXIF, "Foto hat ungültige EXIF-Daten");
 
@@ -454,11 +457,17 @@ public class Txt {
         en.put("requestStats", "Request Statistics");
         de.put("requestStats", "Request-Statistik");
 
+        en.put("resultsFor", "Results for");
+        de.put("resultsFor", "Resultate für");
+
         en.put("save", "Save");
         de.put("save", "Speichern");
 
         en.put("search", "Search");
         de.put("search", "Suchen");
+
+        en.put("searchFreeTextExample", "e.g. \"Re 460 Winterthur\" or \"Bardotka SK\"");
+        de.put("searchFreeTextExample", "z.B. \"Re 460 Winterthur\" oder \"Bardotka SK\"");
 
         en.put("sensitivity", "Sensitivity");
         de.put("sensitivity", "Empfindlichkeit");

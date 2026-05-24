@@ -1,11 +1,17 @@
 package models.mongodb;
 
+import dev.morphia.DeleteOptions;
+import dev.morphia.query.FindOptions;
+import dev.morphia.query.Meta;
 import dev.morphia.query.filters.Filters;
 import entities.Location;
+import entities.User;
 import entities.mongodb.MongoDbLocation;
 import models.LocationsModel;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MongoDbLocationsModel extends MongoDbModel<MongoDbLocation> implements LocationsModel {
@@ -59,5 +65,15 @@ public class MongoDbLocationsModel extends MongoDbModel<MongoDbLocation> impleme
         }
         String reverseName = location.getName().substring(pos + SEPARATOR.length()) + SEPARATOR + location.getName().substring(0, pos);
         return getByName(reverseName);
+    }
+
+    @Override
+    public long deleteUnused(Collection<Integer> usedLocationIds) {
+        return query().filter(Filters.nin("numId", usedLocationIds)).delete(new DeleteOptions().multi(true)).getDeletedCount();
+    }
+
+    @Override
+    public Map<? extends Location, Float> searchFreeText(String freeText) {
+        return query().filter(Filters.text(freeText)).stream(new FindOptions().projection().project(Meta.textScore("searchScore"))).collect(Collectors.toMap(l -> l, l -> l.getSearchScore()));
     }
 }
