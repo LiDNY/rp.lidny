@@ -1,14 +1,13 @@
-package entities;
+package entities.search;
 
 import biz.FreeTextSearch;
+import entities.*;
 import play.mvc.Http;
 import utils.Context;
+import utils.StringUtils;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ContextSearch extends Search {
 
@@ -121,39 +120,47 @@ public class ContextSearch extends Search {
         return query;
     }
 
-    private List<FreeTextSearch.TokenResult> freeTextSearchTokenResults = null;
+    private List<TokenResult> freeTextSearchTokenResults = null;
 
-    private Map<? extends VehicleClass, Float> vehicleSeriesToClassMap(Context context, Map<? extends VehicleSeries, Float> vehicleSeriesMap) {
-        Map<VehicleClass, Float> vehicleClasses = new HashMap<>();
-        for (VehicleSeries vehicleSeries : vehicleSeriesMap.keySet()) {
-            context.getVehicleClassesModel().getByVehicleSeriesId(vehicleSeries.getId()).forEach(vc -> {
-                vehicleClasses.put(vc, vehicleSeriesMap.get(vehicleSeries));
-            });
+    private List<String> tokenize(String freeText) {
+        List<String> tokens = new ArrayList<>();
+        boolean quoted = false;
+        for( String s : freeText.split("\"") ) {
+            if (quoted) {
+                tokens.add(s);
+            } else {
+                tokens.addAll(Arrays.asList(s.split(" ")));
+            }
+            quoted = !quoted;
         }
-        return vehicleClasses;
+        return tokens.stream().map(t -> t.trim()).filter(t -> !t.isEmpty()).toList();
     }
 
-    public List<FreeTextSearch.TokenResult> getFreeTextSearchTokenResults() {
+    public List<TokenResult> getFreeTextSearchTokenResults() {
         if (freeTextSearchTokenResults == null) {
-            List<String> tokens = FreeTextSearch.tokenize(getFreeText());
+            List<String> tokens = tokenize(getFreeText());
 
-            List<FreeTextSearch.TokenResult> tokenResults = new ArrayList<>();
+            List<TokenResult> tokenResults = new ArrayList<>();
             for (String token : tokens) {
                 String quotedToken = token.contains(" ") ? "\"" + token + "\"" : token;
-                tokenResults.add(
-                        new FreeTextSearch.TokenResult(
-                                token,
-                                context.getUsersModel().searchFreeText(quotedToken),
-                                context.getCountriesModel().searchFreeText(quotedToken),
-                                context.getLocationsModel().searchFreeText(quotedToken),
-                                context.getOperatorsModel().searchFreeText(quotedToken),
-                                context.getVehicleClassesModel().searchFreeText(quotedToken),
-                                vehicleSeriesToClassMap(context, context.getVehicleSeriesModel().searchFreeText(quotedToken))
-                        )
-                );
+
+                Map<FreeTextSearch.SearchCriterion<NumIdEntity>, Map<NumIdEntity, Float>> results = new HashMap<>();
+                for (FreeTextSearch.SearchCriterion sc : FreeTextSearch.SEARCH_CRITERIA) {
+                    results.put(sc, sc.search(context, quotedToken));
+                }
+
+                tokenResults.add(new TokenResult(token, results));
             }
             this.freeTextSearchTokenResults = tokenResults;
         }
         return freeTextSearchTokenResults;
+    }
+
+    public String getFreeTextActive() {
+        return StringUtils.join(getFreeTextSearchTokenResults().stream().filter(tr -> !tr.ignored()).map(tr -> tr.getToken()).toList(), " ");
+    }
+
+    public List<String> getFreeTextInactive() {
+        return getFreeTextSearchTokenResults().stream().filter(tr -> tr.ignored()).map(tr -> tr.getToken()).toList();
     }
 }

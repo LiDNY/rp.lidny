@@ -1,116 +1,77 @@
 package biz;
 
 import entities.*;
+import entities.VehicleSeries;
+import entities.search.ContextSearch;
+import entities.search.TokenResult;
 import play.libs.F;
 import utils.Context;
 
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class FreeTextSearch {
 
-    public static List<String> tokenize(String freeText) {
-        List<String> tokens = new ArrayList<>();
-        boolean quoted = false;
-        for( String s : freeText.split("\"") ) {
-            if (quoted) {
-                tokens.add(s);
-            } else {
-                tokens.addAll(Arrays.asList(s.split(" ")));
-            }
-            quoted = !quoted;
+    public static class SearchCriterion<T extends NumIdEntity> {
+
+        private final String field;
+        private final Function<Photo, Integer> photoGetFunction;
+        private final BiFunction<Context, String, Map<T, Float>> searchFreeTextFunction;
+
+        public SearchCriterion(String field, Function<Photo, Integer> photoGetFunction, BiFunction<Context, String, Map<T, Float>> searchFreeTextFunction) {
+            this.field = field;
+            this.photoGetFunction = photoGetFunction;
+            this.searchFreeTextFunction = searchFreeTextFunction;
         }
-        return tokens.stream().map(t -> t.trim()).filter(t -> !t.isEmpty()).toList();
+
+        public boolean matches(T t, Photo photo) {
+            return Objects.equals(t.getId(), photoGetFunction.apply(photo));
+        }
+
+        public Map<T, Float> search(Context context, String token) {
+            return searchFreeTextFunction.apply(context, token);
+        }
+
+        public String getField() {
+            return field;
+        }
     }
 
-    // FIXME: Missing search by number, description, keywords, photographer, detected text, detected objects
-
-    public static class TokenResult {
-        private final String token;
-        private final Map<? extends User, Float> users;
-        private final Map<? extends Country, Float> countries;
-        private final Map<? extends Location, Float> locations;
-        private final Map<? extends Operator, Float> operators;
-        private final Map<? extends VehicleClass, Float> vehicleClasses;
-        private final Map<? extends VehicleClass, Float> vehicleClassesBySeries;
-
-        public TokenResult(String token,
-                            Map<? extends User, Float> users,
-                            Map<? extends Country, Float> countries,
-                            Map<? extends Location, Float> locations,
-                            Map<? extends Operator, Float> operators,
-                            Map<? extends VehicleClass, Float> vehicleClasses,
-                            Map<? extends VehicleClass, Float> vehicleClassesBySeries) {
-            this.token = token;
-            this.users = users;
-            this.countries = countries;
-            this.locations = locations;
-            this.operators = operators;
-            this.vehicleClasses = vehicleClasses;
-            this.vehicleClassesBySeries = vehicleClassesBySeries;
+    private static Map<? extends VehicleClass, Float> vehicleSeriesToClassMap(Context context, Map<? extends entities.VehicleSeries, Float> vehicleSeriesMap) {
+        Map<VehicleClass, Float> vehicleClasses = new HashMap<>();
+        for (VehicleSeries vehicleSeries : vehicleSeriesMap.keySet()) {
+            context.getVehicleClassesModel().getByVehicleSeriesId(vehicleSeries.getId()).forEach(vc -> {
+                vehicleClasses.put(vc, vehicleSeriesMap.get(vehicleSeries));
+            });
         }
+        return vehicleClasses;
+    }
 
-        @Override
-        public String toString() {
-            String s = token;
-            if (!users.isEmpty()) {
-                s += "->" + users;
-            }
-            if (!countries.isEmpty()) {
-                s += "->" + countries;
-            }
-            if (!locations.isEmpty()) {
-                s += "->" + locations;
-            }
-            if (!operators.isEmpty()) {
-                s += "->" + operators;
-            }
-            if (!vehicleClasses.isEmpty()) {
-                s += "->" + vehicleClasses;
-            }
-            if (!vehicleClassesBySeries.isEmpty()) {
-                s += "->" + vehicleClassesBySeries;
-            }
-            return s;
-        }
+    // FIXME: Missing search by number, keywords, photographer, detected text, detected objects
 
-        public Map<? extends User, Float> getUsers() {
-            return users;
-        }
-
-        public Map<? extends Country, Float> getCountries() {
-            return countries;
-        }
-
-        public Map<? extends Location, Float> getLocations() {
-            return locations;
-        }
-
-        public Map<? extends Operator, Float> getOperators() {
-            return operators;
-        }
-
-        public Map<? extends VehicleClass, Float> getVehicleClasses() {
-            return vehicleClasses;
-        }
-
-        public Map<? extends VehicleClass, Float> getVehicleClassesBySeries() {
-            return vehicleClassesBySeries;
-        }
+    public static List<SearchCriterion> SEARCH_CRITERIA;
+    static {
+        SEARCH_CRITERIA = List.of(
+                new SearchCriterion<>("userId", Photo::getUserId, (c, s) -> c.getUsersModel().searchFreeText(s)),
+                new SearchCriterion<>("countryId", Photo::getCountryId, (c, s) -> c.getCountriesModel().searchFreeText(s)),
+                new SearchCriterion<>("locationId", Photo::getLocationId, (c, s) -> c.getLocationsModel().searchFreeText(s)),
+                new SearchCriterion<>("operatorId", Photo::getOperatorId, (c, s) -> c.getOperatorsModel().searchFreeText(s)),
+                new SearchCriterion<>("vehicleClassId", Photo::getVehicleClassId, (c, s) -> c.getVehicleClassesModel().searchFreeText(s)),
+                new SearchCriterion<>("vehicleClassId", Photo::getVehicleClassId, (c, s) -> vehicleSeriesToClassMap(c, c.getVehicleSeriesModel().searchFreeText(s))),
+                new SearchCriterion<>("numId", Photo::getId, (c, s) -> c.getPhotosModel().searchFreeText(s))
+        );
     }
 
     private static float rank(List<TokenResult> tokenResults, Photo photo) {
         float[] points = new float[1]; // the lambdas want an immutable variable, hence this array hack
         points[0] = 0.0f;
-
         for (TokenResult r : tokenResults) {
-            r.getUsers().keySet().stream().filter(u -> Objects.equals(u.getId(), photo.getUserId())).forEach(u -> points[0] += r.getUsers().get(u));
-            r.getCountries().keySet().stream().filter(c -> Objects.equals(c.getId(), photo.getCountryId())).forEach(c -> points[0] += r.getCountries().get(c));
-            r.getLocations().keySet().stream().filter(l -> Objects.equals(l.getId(), photo.getLocationId())).forEach(l -> points[0] += r.getLocations().get(l));
-            r.getOperators().keySet().stream().filter(o -> Objects.equals(o.getId(), photo.getOperatorId())).forEach(o -> points[0] += r.getOperators().get(o));
-            r.getVehicleClasses().keySet().stream().filter(v -> Objects.equals(v.getId(), photo.getVehicleClassId())).forEach(v -> points[0] += r.getVehicleClasses().get(v));
-            r.getVehicleClassesBySeries().keySet().stream().filter(v -> Objects.equals(v.getId(), photo.getVehicleClassId())).forEach(v -> points[0] += r.getVehicleClassesBySeries().get(v));
+            for (SearchCriterion c : SEARCH_CRITERIA) {
+                Map<NumIdEntity, Float> m = r.get(c);
+                m.keySet().stream().filter(o -> c.matches(o, photo)).forEach(o -> points[0] += m.get(o));
+            }
         }
-
         return points[0];
     }
 
