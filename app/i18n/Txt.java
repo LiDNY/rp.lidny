@@ -586,11 +586,6 @@ public class Txt {
         en.put("acceptTC", "I accept the terms and conditions");
         de.put("acceptTC", "Ich akzeptiere die Geschäftsbedingungen");
 
-        en.put("travelogues", "Travelogues");
-        de.put("travelogues", "Reiseberichte");
-
-        en.put("travelogueCreate", "Create travelogues");
-        de.put("travelogueCreate", "Reisebericht erstellen");
 
         en.put("unused", "Unused");
         de.put("unused", "Unbenutzt");

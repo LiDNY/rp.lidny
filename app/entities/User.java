@@ -21,9 +21,7 @@ public interface User extends LocalizedEntity, NumIdEntity {
 
     boolean isAdmin();
 
-    default boolean canEdit(Travelogue t) {
-        return t != null && (isAdmin() || this.getId() == t.getUserId());
-    }
+
 
     default boolean canEdit(Photo photo) {
         return this.isAdmin() || this.equals(photo.getUser());

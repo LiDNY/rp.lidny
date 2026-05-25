@@ -198,7 +198,7 @@ public class PhotoController extends Controller {
         List<? extends Location> locations = context.getLocationsModel().getAll().sorted(LocalizedComparator.get(data.lang)).toList();
         List<? extends Operator> operators = context.getOperatorsModel().getAll().sorted(LocalizedComparator.get(data.lang)).toList();
         List<? extends VehicleClass> vehicleClasses = context.getVehicleClassesModel().getAll().sorted(LocalizedComparator.get(data.lang)).toList();
-        return ok(views.html.photos.edit.render(request, data, licenses, photoTypes, countries, locations, operators, vehicleClasses, Collections.emptyMap(), Config.Option.GOOGLE_MAPS_JS_KEY.get(), user));
+        return ok(views.html.photos.edit.render(request, data, licenses, photoTypes, countries, locations, operators, vehicleClasses, Collections.emptyMap(), user));
     }
 
     public Result editPost(Http.Request request, String ids, String returnUrl) {
@@ -219,7 +219,7 @@ public class PhotoController extends Controller {
             List<? extends Location> locations = context.getLocationsModel().getAll().sorted(LocalizedComparator.get(data.lang)).toList();
             List<? extends Operator> operators = context.getOperatorsModel().getAll().sorted(LocalizedComparator.get(data.lang)).toList();
             List<? extends VehicleClass> vehicleClasses = context.getVehicleClassesModel().getAll().sorted(LocalizedComparator.get(data.lang)).toList();
-            return ok(views.html.photos.edit.render(request, data, licenses, photoTypes, countries, locations, operators, vehicleClasses, e.getErrors(), Config.Option.GOOGLE_MAPS_JS_KEY.get(), user));
+            return ok(views.html.photos.edit.render(request, data, licenses, photoTypes, countries, locations, operators, vehicleClasses, e.getErrors(), user));
         }
         return redirect(data.returnUrl);
     }
@@ -425,7 +425,7 @@ public class PhotoController extends Controller {
     }
 
     public Result viewConfig(Http.Request request, Integer id) {
-        return ok("var mapsKey = \"" + Config.Option.GOOGLE_MAPS_JS_KEY.get() + "\";\n").as(Http.MimeTypes.JAVASCRIPT);
+        return ok("").as(Http.MimeTypes.JAVASCRIPT);
     }
 
     public Result editConfig(Http.Request request, String ids) {

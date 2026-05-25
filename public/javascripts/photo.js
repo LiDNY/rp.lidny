@@ -121,7 +121,12 @@ var transitionMap = function(longitude, latitude) {
 	}
 	var newMap;
 	if (longitude && latitude) {
-		newMap = $('<iframe>').attr("id", "map_canvas").attr("src", "https://www.google.com/maps/embed/v1/place?key=" + mapsKey + "&q="+latitude+","+longitude);
+        var bboxLngMin = longitude - 0.01;
+        var bboxLatMin = latitude - 0.01;
+        var bboxLngMax = longitude + 0.01;
+        var bboxLatMax = latitude + 0.01;
+        var srcUrl = "https://www.openstreetmap.org/export/embed.html?bbox=" + bboxLngMin + "%2C" + bboxLatMin + "%2C" + bboxLngMax + "%2C" + bboxLatMax + "&layer=mapnik&marker=" + latitude + "%2C" + longitude;
+		newMap = $('<iframe>').attr("id", "map_canvas").attr("src", srcUrl).attr("style", "width: 100%; height: 300px; border: 0;");
 	} else {
 		newMap = $();
 	}

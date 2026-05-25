@@ -1,4 +1,4 @@
-package models.google;
+package models.openstreetmap;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -11,7 +11,6 @@ import entities.Country;
 import entities.Station;
 import models.CountriesModel;
 import models.GeocodingModel;
-import utils.Config;
 import utils.geometry.DistanceComparator;
 import utils.geometry.SimplePoint;
 import utils.geometry.Point;
@@ -27,10 +26,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.Map;
 
-public class GoogleGeocodingModel implements GeocodingModel {
+public class OpenStreetMapGeocodingModel implements GeocodingModel {
     private final HttpClient client;
-
     private static final ObjectMapper MAPPER;
 
     @Inject
@@ -38,7 +37,6 @@ public class GoogleGeocodingModel implements GeocodingModel {
 
     static {
         MAPPER = new ObjectMapper();
-        // configure mapper to use fields instead of setter/getter/constructor
         MAPPER.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
         MAPPER.setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
         MAPPER.setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE);
@@ -49,7 +47,7 @@ public class GoogleGeocodingModel implements GeocodingModel {
         MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    public GoogleGeocodingModel() {
+    public OpenStreetMapGeocodingModel() {
         client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
     }
 
@@ -70,19 +68,19 @@ public class GoogleGeocodingModel implements GeocodingModel {
     }
 
     @Override
-    public CompletableFuture<Country> getCountryByPoint(Point point)  {
+    public CompletableFuture<Country> getCountryByPoint(Point point) {
         URI uri;
         try {
-            uri = new URI("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + point.getLat() + "," + point.getLng() + "&result_type=country&key=" + Config.Option.GOOGLE_MAPS_SERVER_KEY.get());
+            uri = new URI("https://nominatim.openstreetmap.org/reverse?lat=" + point.getLat() + "&lon=" + point.getLng() + "&format=json");
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-        HttpRequest req = HttpRequest.newBuilder(uri).build();
+        HttpRequest req = HttpRequest.newBuilder(uri).header("User-Agent", "bahnbilder.ch").build();
         return client.sendAsync(req, java.net.http.HttpResponse.BodyHandlers.ofByteArray())
-                .thenApply(jsonResponseHandler(new TypeReference<GoogleGeocodeResponse>() {}))
-                .thenApply(ggr -> {
-                    if (ggr != null && ggr.results.size() > 0 && ggr.results.get(0).address_components.size() > 0) {
-                        return countriesModel.getByCode(ggr.results.get(0).address_components.get(0).short_name);
+                .thenApply(jsonResponseHandler(new TypeReference<NominatimResponse>() {}))
+                .thenApply(nr -> {
+                    if (nr != null && nr.address != null && nr.address.country_code != null) {
+                        return countriesModel.getByCode(nr.address.country_code.toUpperCase());
                     } else {
                         return null;
                     }
@@ -95,15 +93,22 @@ public class GoogleGeocodingModel implements GeocodingModel {
         for (int distance : distances) {
             URI uri;
             try {
-                uri = new URI("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + point.getLat() + "," + point.getLng() + "&types=train_station&radius=" + distance + "&language=de&key=" + Config.Option.GOOGLE_MAPS_SERVER_KEY.get());
-            } catch (URISyntaxException e) {
+                String query = "[out:json];node(around:" + distance + "," + point.getLat() + "," + point.getLng() + ")[railway=station];out;";
+                uri = new URI("https://overpass-api.de/api/interpreter?data=" + java.net.URLEncoder.encode(query, "UTF-8"));
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            HttpRequest req = HttpRequest.newBuilder(uri).build();
+            HttpRequest req = HttpRequest.newBuilder(uri).header("User-Agent", "bahnbilder.ch").build();
             try {
-                GoogleGeocodeResponse r = client.sendAsync(req, java.net.http.HttpResponse.BodyHandlers.ofByteArray()).thenApply(jsonResponseHandler(new TypeReference<GoogleGeocodeResponse>() {})).get();
-                if (r.results.size() >= 3) {
-                    return r.results.stream().map(rr -> new Station(rr.name, new SimplePoint(rr.geometry.location.lat, rr.geometry.location.lng))).sorted(new DistanceComparator(point)).collect(Collectors.toUnmodifiableList());
+                OverpassResponse r = client.sendAsync(req, java.net.http.HttpResponse.BodyHandlers.ofByteArray())
+                        .thenApply(jsonResponseHandler(new TypeReference<OverpassResponse>() {}))
+                        .get();
+                if (r != null && r.elements != null && r.elements.size() >= 3) {
+                    return r.elements.stream()
+                            .filter(e -> e.tags != null && e.tags.name != null)
+                            .map(e -> new Station(e.tags.name, new SimplePoint(e.lat, e.lon)))
+                            .sorted(new DistanceComparator(point))
+                            .collect(Collectors.toUnmodifiableList());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -112,26 +117,25 @@ public class GoogleGeocodingModel implements GeocodingModel {
         return Collections.emptyList();
     }
 
-    private static class GoogleGeocodeResonseResultAddressComponent {
-        String short_name;
+    private static class NominatimResponse {
+        NominatimAddress address;
     }
 
-    private static class GooglePoint {
+    private static class NominatimAddress {
+        String country_code;
+    }
+
+    private static class OverpassResponse {
+        List<OverpassElement> elements;
+    }
+
+    private static class OverpassElement {
         Double lat;
-        Double lng;
+        Double lon;
+        OverpassTags tags;
     }
 
-    private static class GoogleGeocodeResponseResultGeometry {
-        GooglePoint location;
-    }
-
-    private static class GoogleGeocodeResonseResult {
-        List<GoogleGeocodeResonseResultAddressComponent> address_components;
-        GoogleGeocodeResponseResultGeometry geometry;
+    private static class OverpassTags {
         String name;
-    }
-
-    private static class GoogleGeocodeResponse {
-        List<GoogleGeocodeResonseResult> results;
     }
 }

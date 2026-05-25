@@ -54,10 +54,6 @@ public class Context {
         return models.getInstance(clazz);
     }
 
-    public CalendarOrdersModel getCalendarOrdersModel() {
-        return getContextModel(ContextCalendarOrdersModel.class);
-    }
-
     public CountriesModel getCountriesModel() {
         return getContextModel(ContextCountriesModel.class);
     }
@@ -98,9 +94,7 @@ public class Context {
         return getContextModel(ContextPhotoTypesModel.class);
     }
 
-    public TraveloguesModel getTraveloguesModel() {
-        return getContextModel(ContextTraveloguesModel.class);
-    }
+
 
     public UsersModel getUsersModel() {
         return getContextModel(ContextUsersModel.class);

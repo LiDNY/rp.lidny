@@ -1,7 +1,7 @@
 import biz.*;
 import com.google.inject.AbstractModule;
 import models.*;
-import models.google.GoogleGeocodingModel;
+import models.openstreetmap.OpenStreetMapGeocodingModel;
 import models.hardcoded.HardcodedLicensesModel;
 import models.mongodb.*;
 import services.*;
@@ -13,9 +13,8 @@ public class Module extends AbstractModule {
         bind(MongoDb.class).asEagerSingleton();
         bind(Mail.class).asEagerSingleton();
         bind(Railinfo.class).asEagerSingleton();
-        bind(Travelogues.class);
+
         bind(Photos.class);
-        bind(Calendars.class);
         bind(Countries.class);
         bind(Operators.class);
         bind(VehicleClasses.class);
@@ -23,12 +22,11 @@ public class Module extends AbstractModule {
         bind(Keywords.class);
         bind(UsersModel.class).to(MongoDbUsersModel.class).asEagerSingleton();
         bind(CountriesModel.class).to(MongoDbCountriesModel.class).asEagerSingleton();
-        bind(CalendarOrdersModel.class).to(MongoDbCalendarOrdersModel.class).asEagerSingleton();
         bind(KeywordsModel.class).to(MongoDbKeywordsModel.class).asEagerSingleton();
         bind(OperatorsModel.class).to(MongoDbOperatorsModel.class).asEagerSingleton();
         bind(PhotoTypesModel.class).to(MongoDbPhotoTypesModel.class).asEagerSingleton();
         bind(LocationsModel.class).to(MongoDbLocationsModel.class).asEagerSingleton();
-        bind(TraveloguesModel.class).to(MongoDbTraveloguesModel.class).asEagerSingleton();
+
         bind(VehicleClassesModel.class).to(MongoDbVehicleClassesModel.class).asEagerSingleton();
         bind(VehiclePropulsionsModel.class).to(MongoDbVehiclePropulsionsModel.class).asEagerSingleton();
         bind(VehicleTypesModel.class).to(MongoDbVehicleTypesModel.class).asEagerSingleton();
@@ -38,7 +36,7 @@ public class Module extends AbstractModule {
         bind(ViewsModel.class).to(MongoDbViewsModel.class).asEagerSingleton();
         bind(RequestsDailyModel.class).to(MongoDbRequestsDailyModel.class).asEagerSingleton();
         bind(LicensesModel.class).to(HardcodedLicensesModel.class);
-        bind(GeocodingModel.class).to(GoogleGeocodingModel.class);
+        bind(GeocodingModel.class).to(OpenStreetMapGeocodingModel.class);
         bind(Jobs.class).asEagerSingleton();
         if (Config.Option.LIVEFILES_HOSTNAME.get() != null) {
             bind(LiveFiles.class).asEagerSingleton();
