@@ -22,7 +22,6 @@ This is a fork of [bahnbilder.ch](https://github.com/davidgubler/bahnbilder.ch).
 - User registration
 - More user friendly setup
 - Video
-- Add all stuff from main branch 
 
 Suggest more features in our [Telegram](https://ldn.to/tg)
 
